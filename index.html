@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000;--s:#111;--s2:#1a1a1a;--b:rgba(255,255,255,.12);--t:#f4f4f4;--t2:#a8a8a8;--a:#7c5cff;--r:#fa4d56;--g:#42be65}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;min-height:100vh;padding:18px}
+.wrap{max-width:760px;margin:0 auto;animation:up .5s both}
+@keyframes up{from{opacity:0;transform:translateY(20px)}}
+.card{background:var(--s);border:1px solid var(--b);border-radius:16px;padding:20px;margin-bottom:14px}
+h1{font-size:20px;margin-bottom:6px}h2{font-size:16px;margin-bottom:12px}
+p.m{color:var(--t2);font-size:13px;line-height:1.8;margin-bottom:12px}
+label{display:block;font-size:12px;color:var(--t2);margin:10px 0 5px}
+input,select,textarea{width:100%;padding:10px 12px;background:#0a0a0a;border:1px solid var(--b);border-radius:10px;color:var(--t);font-family:inherit;font-size:13px;outline:none;transition:.2s}
+input:focus,select:focus,textarea:focus{border-color:var(--a);box-shadow:0 0 0 3px rgba(124,92,255,.15)}
+textarea{min-height:200px;direction:ltr;text-align:left;font-family:'IBM Plex Mono',monospace;line-height:1.6}
+.btn{padding:10px 16px;border-radius:10px;border:1px solid var(--b);background:var(--s2);color:var(--t);font-family:inherit;font-size:13px;cursor:pointer;transition:.2s}
+.btn:hover{transform:translateY(-2px);border-color:var(--a)}
+.btn.p{background:var(--a);border-color:var(--a);color:#fff}
+.btn.d{color:var(--r);border-color:rgba(250,77,86,.4)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.msg{margin-top:10px;font-size:12.5px;padding:9px 12px;border-radius:10px;display:none;line-height:1.7}
+.msg.ok{display:block;background:rgba(66,190,101,.1);color:var(--g)}
+.msg.er{display:block;background:rgba(250,77,86,.1);color:var(--r)}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--b);animation:up .4s both}
+.item small{color:var(--t2);font-size:11px;display:block;margin-top:3px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+#panel{display:none}
+img.pv{max-width:140px;border-radius:10px;margin-top:8px;display:block}
+::selection{background:#7c5cff;color:#fff}h1,h2,.btn{font-family:'Kufam','IBM Plex Sans Arabic',sans-serif}
+@font-face{font-family:'KH-Head';src:url(https://files.catbox.moe/va4cz0.otf) format('opentype');font-weight:400;font-display:swap}
+@font-face{font-family:'KH-Head';src:url(https://files.catbox.moe/sgpf34.otf) format('opentype');font-weight:700;font-display:swap}
+@font-face{font-family:'KH-Text';src:url(https://files.catbox.moe/2k6107.otf) format('opentype');font-weight:400;font-display:swap}
+@font-face{font-family:'KH-Text';src:url(https://files.catbox.moe/4rjalb.otf) format('opentype');font-weight:700;font-display:swap}
+@font-face{font-family:'KH-Time';src:url(https://files.catbox.moe/mplj7v.otf) format('opentype');font-weight:normal;font-display:swap}
+@font-face{font-family:'KH-Note';src:url(https://files.catbox.moe/uqr0yx.otf) format('opentype');font-weight:normal;font-display:swap}
+@font-face{font-family:'KH-Warn';src:url(https://files.catbox.moe/flmb6d.otf) format('opentype');font-weight:normal;font-display:swap}
+@font-face{font-family:'KH-Must';src:url(https://files.catbox.moe/1xmhcz.otf) format('opentype');font-weight:normal;font-display:swap}
+body,p,input,textarea,select,label,.step p,.card p{font-family:'KH-Text','IBM Plex Sans Arabic',system-ui,sans-serif}
+h1,h2,h3,.tabs button,.btn,.chip,.drawer a,.drawer button,.dc,.gbtn,.vis,.fwt,.brand{font-family:'KH-Head','Kufam','IBM Plex Sans Arabic',system-ui,sans-serif}
+.date,.pm{font-family:'KH-Time','KH-Text','IBM Plex Sans Arabic',system-ui,sans-serif}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Kufam:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="wrap">
+
+<div class="card" id="login">
+  <h1>لوحة التحكم</h1>
+  <p class="m">أول مرة: اكتب بريد المدير واختر كلمة مرور ثم اضغط إنشاء كلمة المرور، وسيصلك رابط تفعيل على البريد. بعد التفعيل استخدم دخول.</p>
+  <label>البريد الإلكتروني</label><input type="email" id="em" dir="ltr">
+  <label>كلمة المرور</label><input type="password" id="pw" dir="ltr">
+  <div class="row">
+    <button class="btn p" onclick="signIn()">دخول</button>
+    <button class="btn" onclick="firstTime()">إنشاء كلمة المرور لأول مرة</button>
+    <button class="btn" onclick="reset()">نسيت كلمة المرور</button>
+  </div>
+  <div class="msg" id="lm"></div>
+</div>
+
+<div id="panel">
+  <div class="top"><h1>إدارة المحتوى</h1><button class="btn" onclick="out()">خروج</button></div>
+
+  <div class="card">
+    <h2 id="ft">محتوى جديد</h2>
+    <div class="two">
+      <div><label>النوع</label><select id="type"><option value="post">مقال في المدونة</option><option value="news">خبر</option><option value="project">مشروع</option></select></div>
+      <div><label>العنوان</label><input id="title"></div>
+    </div>
+    <label>ملخص قصير</label><input id="summary">
+    <label>رابط خارجي (اختياري، للمشاريع)</label><input id="link" dir="ltr">
+    <label>صورة الغلاف</label>
+    <input type="file" id="coverfile" accept="image/*" onchange="upCover()">
+    <input id="cover" dir="ltr" placeholder="رابط الصورة يظهر هنا" style="margin-top:6px">
+    <img class="pv" id="cpv" style="display:none" alt="">
+
+    <label>المحتوى (JSON أو نص عادي)</label>
+    <textarea id="body" placeholder='[{"text":"عنوان","h":true,"color":"#7c5cff"},{"text":"فقرة عادية"},{"text":"نص ملون","color":"#42be65","bold":true}]'></textarea>
+    <p class="m" style="margin-top:6px">الحقول المدعومة للكتلة: text وcolor وbold وsize وalign وh للعنوان وlink لرابط قابل للضغط (والروابط داخل النص تتحول تلقائيًا). للصورة: {"img":"رابط"}</p>
+
+    <div class="two">
+      <div><label>النص (لكتلة ملونة أو تنبيه أو تحذير أو يجب)</label><input id="bt"></div>
+      <div><label>اللون</label><input type="color" id="bc" value="#7c5cff" style="height:40px;padding:3px"></div>
+    </div>
+    <div class="row">
+      <button class="btn" onclick="addBlock()">إضافة كتلة نص ملونة</button>
+      <button class="btn" onclick="addBox('note')">إضافة تنبيه</button>
+      <button class="btn" onclick="addBox('warn')">إضافة تحذير</button>
+      <button class="btn" onclick="addBox('must')">إضافة يجب</button>
+      <button class="btn" onclick="document.getElementById('imgfile').click()">رفع صورة وإدراجها</button>
+      <input type="file" id="imgfile" accept="image/*" style="display:none" onchange="upInline()">
+    </div>
+    <div class="row">
+      <button class="btn p" id="savebtn" onclick="save()">نشر</button>
+      <button class="btn" onclick="resetForm()">إلغاء التعديل</button>
+    </div>
+    <div class="msg" id="fm"></div>
+  </div>
+
+  <div class="card"><h2>عدد الزوار</h2><p class="m" id="vinfo"></p><label>العدد القديم (يُضاف عليه العدد الفعلي تلقائيًا)</label><input type="number" id="vbase" min="0"><div class="row"><button class="btn p" onclick="saveBase()">حفظ العدد القديم</button></div><div class="msg" id="vm"></div></div>
+  <div class="card"><h2>المحتوى المنشور</h2><div id="list"></div></div>
+</div>
+</div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+import {getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendEmailVerification,sendPasswordResetEmail,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+import {getFirestore,collection,getDocs,getDoc,addDoc,setDoc,doc,deleteDoc,query,orderBy} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+var ADMIN='khaledahmedelbrbary80@gmail.com';
+var IMGBB='36b0e2658ed6fad2ca48081442f1539b';
+var app=initializeApp({apiKey:"AIzaSyCTGnFOK7m_xNod8mwBPB5HTgTP2BrNm6o",authDomain:"cyberintel-d0d4f.firebaseapp.com",projectId:"cyberintel-d0d4f",storageBucket:"cyberintel-d0d4f.firebasestorage.app",messagingSenderId:"533279564815",appId:"1:533279564815:web:d373567c2be86311127af7a"});
+var auth=getAuth(app),db=getFirestore(app),editing=null,CACHE=[];
+function $(i){return document.getElementById(i)}
+function msg(id,t,k){var e=$(id);e.textContent=t;e.className='msg '+k}
+function emailOk(){var e=$('em').value.trim().toLowerCase();if(e!==ADMIN){msg('lm','هذا البريد غير مصرح له.','er');return null}return e}
+
+window.firstTime=async function(){
+  var e=emailOk();if(!e)return;var p=$('pw').value;
+  if(p.length<8){msg('lm','كلمة المرور 8 أحرف على الأقل.','er');return}
+  try{
+    var c=await createUserWithEmailAndPassword(auth,e,p);
+    await sendEmailVerification(c.user);
+    await signOut(auth);
+    msg('lm','تم إنشاء الحساب. افتح رابط التفعيل المرسل إلى بريدك ثم اضغط دخول.','ok');
+  }catch(x){
+    msg('lm',x.code==='auth/email-already-in-use'?'الحساب موجود بالفعل، استخدم دخول أو نسيت كلمة المرور.':(x.message||x.code),'er');
+  }
+};
+window.signIn=async function(){
+  var e=emailOk();if(!e)return;
+  try{
+    var c=await signInWithEmailAndPassword(auth,e,$('pw').value);
+    if(!c.user.emailVerified){await sendEmailVerification(c.user);await signOut(auth);msg('lm','البريد غير مفعّل. أرسلنا رابط تفعيل جديدًا.','er')}
+  }catch(x){msg('lm','بيانات الدخول غير صحيحة.','er')}
+};
+window.reset=async function(){
+  var e=emailOk();if(!e)return;
+  try{await sendPasswordResetEmail(auth,e);msg('lm','تم إرسال رابط إعادة التعيين.','ok')}catch(x){msg('lm',x.message||x.code,'er')}
+};
+window.out=function(){signOut(auth)};
+onAuthStateChanged(auth,function(u){
+  var ok=u&&u.emailVerified&&u.email.toLowerCase()===ADMIN;
+  $('login').style.display=ok?'none':'block';$('panel').style.display=ok?'block':'none';
+  if(ok){loadList();loadVis()}
+});
+
+async function upload(file){
+  var fd=new FormData();fd.append('image',file);
+  var r=await fetch('https://api.imgbb.com/1/upload?key='+IMGBB,{method:'POST',body:fd});
+  var j=await r.json();
+  if(!j.success)throw new Error('upload');
+  return j.data.url;
+}
+window.upCover=async function(){
+  var f=$('coverfile').files[0];if(!f)return;
+  msg('fm','جارِ رفع الغلاف','ok');
+  try{var u=await upload(f);$('cover').value=u;$('cpv').src=u;$('cpv').style.display='block';msg('fm','تم رفع الغلاف.','ok')}catch(e){msg('fm','فشل رفع الصورة.','er')}
+};
+function getBlocks(){
+  var raw=$('body').value.trim();if(!raw)return [];
+  try{var d=JSON.parse(raw);if(Array.isArray(d))return d}catch(e){}
+  return raw.split(/\n\s*\n/).map(function(t){return {text:t.trim()}});
+}
+function setBlocks(a){$('body').value=JSON.stringify(a,null,1)}
+window.upInline=async function(){
+  var f=$('imgfile').files[0];if(!f)return;
+  msg('fm','جارِ رفع الصورة','ok');
+  try{var u=await upload(f);var a=getBlocks();a.push({img:u});setBlocks(a);msg('fm','تم رفع الصورة وإدراجها في المحتوى.','ok')}catch(e){msg('fm','فشل رفع الصورة.','er')}
+  $('imgfile').value='';
+};
+window.addBlock=function(){
+  var t=$('bt').value.trim();if(!t)return;
+  var a=getBlocks();a.push({text:t,color:$('bc').value});setBlocks(a);$('bt').value='';
+};
+window.addBox=function(k){
+  var t=$('bt').value.trim();if(!t){msg('fm','اكتب النص أولًا.','er');return}
+  var T={note:'التنبيه',warn:'التحذير',must:'يجب'};
+  var a=getBlocks();a.push({box:k,title:T[k],text:t});setBlocks(a);$('bt').value='';
+};
+window.save=async function(){
+  var title=$('title').value.trim();
+  if(!title){msg('fm','العنوان مطلوب.','er');return}
+  var raw=$('body').value.trim();
+  var data={type:$('type').value,title:title,summary:$('summary').value.trim(),link:$('link').value.trim(),cover:$('cover').value.trim(),body:raw};
+  try{
+    if(editing){
+      var old=CACHE.filter(function(x){return x.id===editing})[0];
+      data.createdAt=old?old.createdAt:new Date().toISOString();
+      await setDoc(doc(db,'khcontent',editing),data);
+    }else{
+      data.createdAt=new Date().toISOString();
+      await addDoc(collection(db,'khcontent'),data);
+    }
+    msg('fm','تم الحفظ.','ok');resetForm(true);loadList();
+  }catch(e){msg('fm','تعذر الحفظ. تأكد من قواعد Firestore: '+(e.code||e.message),'er')}
+};
+window.resetForm=function(keep){
+  editing=null;['title','summary','link','cover','body'].forEach(function(i){$(i).value=''});
+  $('cpv').style.display='none';$('ft').textContent='محتوى جديد';$('savebtn').textContent='نشر';
+  if(keep!==true)msg('fm','','ok'),$('fm').className='msg';
+};
+async function loadVis(){
+  try{var r=doc(db,'khmeta','stats'),s=await getDoc(r);
+    if(!s.exists()){await setDoc(r,{base:0,real:0});s=await getDoc(r)}
+    var d=s.data(),b=Number(d.base)||0,x=Number(d.real)||0;
+    $('vbase').value=b;$('vinfo').textContent='الفعلي المسجل: '+x+' | الإجمالي المعروض للزوار: '+(b+x);
+  }catch(e){msg('vm','تعذر قراءة العداد: '+(e.code||e.message),'er')}
+}
+window.saveBase=async function(){
+  var n=Math.max(0,parseInt($('vbase').value,10)||0);
+  try{var r=doc(db,'khmeta','stats'),s=await getDoc(r),x=s.exists()?(Number(s.data().real)||0):0;
+    await setDoc(r,{base:n,real:x});msg('vm','تم الحفظ.','ok');loadVis()}catch(e){msg('vm','تعذر الحفظ: '+(e.code||e.message),'er')}
+};
+async function loadList(){
+  var s=await getDocs(query(collection(db,'khcontent'),orderBy('createdAt','desc')));
+  CACHE=s.docs.map(function(d){var o=d.data();o.id=d.id;return o});
+  var L=$('list');L.innerHTML='';
+  var N={post:'مقال',news:'خبر',project:'مشروع'};
+  if(!CACHE.length){L.textContent='لا يوجد محتوى بعد.';return}
+  CACHE.forEach(function(it){
+    var r=document.createElement('div');r.className='item';
+    var l=document.createElement('div');var b=document.createElement('b');b.textContent=it.title;
+    var sm=document.createElement('small');sm.textContent=(N[it.type]||'')+' - '+new Date(it.createdAt).toLocaleDateString('ar-EG');
+    l.appendChild(b);l.appendChild(sm);
+    var a=document.createElement('div');a.className='row';a.style.marginTop='0';
+    var e=document.createElement('button');e.className='btn';e.textContent='تعديل';e.onclick=function(){edit(it.id)};
+    var d=document.createElement('button');d.className='btn d';d.textContent='حذف';d.onclick=function(){del(it.id)};
+    a.appendChild(e);a.appendChild(d);r.appendChild(l);r.appendChild(a);L.appendChild(r);
+  });
+}
+function edit(id){
+  var it=CACHE.filter(function(x){return x.id===id})[0];if(!it)return;
+  editing=id;$('type').value=it.type;$('title').value=it.title;$('summary').value=it.summary||'';$('link').value=it.link||'';
+  $('cover').value=it.cover||'';$('body').value=it.body||'';
+  if(it.cover){$('cpv').src=it.cover;$('cpv').style.display='block'}
+  $('ft').textContent='تعديل المحتوى';$('savebtn').textContent='حفظ التعديل';window.scrollTo({top:0,behavior:'smooth'});
+}
+async function del(id){
+  if(!confirm('حذف هذا المحتوى نهائيا؟'))return;
+  await deleteDoc(doc(db,'khcontent',id));loadList();
+}
+</script>
+</body>
+</html>
