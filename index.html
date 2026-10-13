@@ -74,6 +74,8 @@ h1,h2,h3,.tabs button,.btn,.chip,.drawer a,.drawer button,.dc,.gbtn,.vis,.fwt,.b
       <div><label>العنوان</label><input id="title"></div>
     </div>
     <label>ملخص قصير</label><input id="summary">
+    <label>الوسوم (افصل بينها بفاصلة)</label><input id="tags">
+    <div class="row"><label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" id="pinned" style="width:auto;margin:0">تثبيت في الرئيسية</label><label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" id="draft" style="width:auto;margin:0">مسودة (غير منشور)</label></div>
     <label>رابط خارجي (اختياري، للمشاريع)</label><input id="link" dir="ltr">
     <label>صورة الغلاف</label>
     <input type="file" id="coverfile" accept="image/*" onchange="upCover()">
@@ -104,7 +106,7 @@ h1,h2,h3,.tabs button,.btn,.chip,.drawer a,.drawer button,.dc,.gbtn,.vis,.fwt,.b
   </div>
 
   <div class="card"><h2>عدد الزوار</h2><p class="m" id="vinfo"></p><label>العدد القديم (يُضاف عليه العدد الفعلي تلقائيًا)</label><input type="number" id="vbase" min="0"><div class="row"><button class="btn p" onclick="saveBase()">حفظ العدد القديم</button></div><div class="msg" id="vm"></div></div>
-  <div class="card"><h2>المحتوى المنشور</h2><div id="list"></div></div>
+  <div class="card"><h2>المحتوى المنشور</h2><p class="m" id="cnts"></p><div id="list"></div></div>
 </div>
 </div>
 
@@ -187,7 +189,7 @@ window.save=async function(){
   var title=$('title').value.trim();
   if(!title){msg('fm','العنوان مطلوب.','er');return}
   var raw=$('body').value.trim();
-  var data={type:$('type').value,title:title,summary:$('summary').value.trim(),link:$('link').value.trim(),cover:$('cover').value.trim(),body:raw};
+  var data={type:$('type').value,title:title,summary:$('summary').value.trim(),link:$('link').value.trim(),cover:$('cover').value.trim(),body:raw,tags:$('tags').value.trim(),pinned:$('pinned').checked,draft:$('draft').checked};
   try{
     if(editing){
       var old=CACHE.filter(function(x){return x.id===editing})[0];
@@ -201,7 +203,7 @@ window.save=async function(){
   }catch(e){msg('fm','تعذر الحفظ. تأكد من قواعد Firestore: '+(e.code||e.message),'er')}
 };
 window.resetForm=function(keep){
-  editing=null;['title','summary','link','cover','body'].forEach(function(i){$(i).value=''});
+  editing=null;['title','summary','link','cover','body','tags'].forEach(function(i){$(i).value=''});$('pinned').checked=false;$('draft').checked=false;
   $('cpv').style.display='none';$('ft').textContent='محتوى جديد';$('savebtn').textContent='نشر';
   if(keep!==true)msg('fm','','ok'),$('fm').className='msg';
 };
@@ -220,13 +222,14 @@ window.saveBase=async function(){
 async function loadList(){
   var s=await getDocs(query(collection(db,'khcontent'),orderBy('createdAt','desc')));
   CACHE=s.docs.map(function(d){var o=d.data();o.id=d.id;return o});
+  var cn=function(t){return CACHE.filter(function(x){return x.type===t}).length};$('cnts').textContent='مقالات: '+cn('post')+' | مشاريع: '+cn('project')+' | أخبار: '+cn('news')+' | مسودات: '+CACHE.filter(function(x){return x.draft}).length;
   var L=$('list');L.innerHTML='';
   var N={post:'مقال',news:'خبر',project:'مشروع'};
   if(!CACHE.length){L.textContent='لا يوجد محتوى بعد.';return}
   CACHE.forEach(function(it){
     var r=document.createElement('div');r.className='item';
     var l=document.createElement('div');var b=document.createElement('b');b.textContent=it.title;
-    var sm=document.createElement('small');sm.textContent=(N[it.type]||'')+' - '+new Date(it.createdAt).toLocaleDateString('ar-EG');
+    var sm=document.createElement('small');sm.textContent=(N[it.type]||'')+' - '+new Date(it.createdAt).toLocaleDateString('ar-EG')+(it.pinned?' - مثبت':'')+(it.draft?' - مسودة':'');
     l.appendChild(b);l.appendChild(sm);
     var a=document.createElement('div');a.className='row';a.style.marginTop='0';
     var e=document.createElement('button');e.className='btn';e.textContent='تعديل';e.onclick=function(){edit(it.id)};
@@ -237,7 +240,7 @@ async function loadList(){
 function edit(id){
   var it=CACHE.filter(function(x){return x.id===id})[0];if(!it)return;
   editing=id;$('type').value=it.type;$('title').value=it.title;$('summary').value=it.summary||'';$('link').value=it.link||'';
-  $('cover').value=it.cover||'';$('body').value=it.body||'';
+  $('cover').value=it.cover||'';$('body').value=it.body||'';$('tags').value=it.tags||'';$('pinned').checked=!!it.pinned;$('draft').checked=!!it.draft;
   if(it.cover){$('cpv').src=it.cover;$('cpv').style.display='block'}
   $('ft').textContent='تعديل المحتوى';$('savebtn').textContent='حفظ التعديل';window.scrollTo({top:0,behavior:'smooth'});
 }
