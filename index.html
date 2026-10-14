@@ -220,6 +220,7 @@ window.saveBase=async function(){
     await setDoc(r,{base:n,real:x});msg('vm','تم الحفظ.','ok');loadVis()}catch(e){msg('vm','تعذر الحفظ: '+(e.code||e.message),'er')}
 };
 async function loadList(){
+  var ST={};try{(await getDocs(collection(db,'khstats'))).forEach(function(d){ST[d.id]=d.data()})}catch(e){}
   var s=await getDocs(query(collection(db,'khcontent'),orderBy('createdAt','desc')));
   CACHE=s.docs.map(function(d){var o=d.data();o.id=d.id;return o});
   var cn=function(t){return CACHE.filter(function(x){return x.type===t}).length};$('cnts').textContent='مقالات: '+cn('post')+' | مشاريع: '+cn('project')+' | أخبار: '+cn('news')+' | مسودات: '+CACHE.filter(function(x){return x.draft}).length;
@@ -229,7 +230,7 @@ async function loadList(){
   CACHE.forEach(function(it){
     var r=document.createElement('div');r.className='item';
     var l=document.createElement('div');var b=document.createElement('b');b.textContent=it.title;
-    var sm=document.createElement('small');sm.textContent=(N[it.type]||'')+' - '+new Date(it.createdAt).toLocaleDateString('ar-EG')+(it.pinned?' - مثبت':'')+(it.draft?' - مسودة':'');
+    var sm=document.createElement('small');sm.textContent=(N[it.type]||'')+' - '+new Date(it.createdAt).toLocaleDateString('ar-EG')+(it.pinned?' - مثبت':'')+(it.draft?' - مسودة':'')+(ST[it.id]?' - '+(ST[it.id].views||0)+' مشاهدة - '+(ST[it.id].likes||0)+' إعجاب':'');
     l.appendChild(b);l.appendChild(sm);
     var a=document.createElement('div');a.className='row';a.style.marginTop='0';
     var e=document.createElement('button');e.className='btn';e.textContent='تعديل';e.onclick=function(){edit(it.id)};
