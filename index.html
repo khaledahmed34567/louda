@@ -45,6 +45,8 @@ img.pv{max-width:140px;border-radius:10px;margin-top:8px;display:block}
 body,p,input,textarea,select,label,.step p,.card p{font-family:'KH-Text','IBM Plex Sans Arabic',system-ui,sans-serif}
 h1,h2,h3,.tabs button,.btn,.chip,.drawer a,.drawer button,.dc,.gbtn,.vis,.fwt,.brand{font-family:'KH-Head','Kufam','IBM Plex Sans Arabic',system-ui,sans-serif}
 .date,.pm{font-family:'KH-Time','KH-Text','IBM Plex Sans Arabic',system-ui,sans-serif}
+.tabsb{display:flex;gap:6px;overflow-x:auto;padding:4px 0 12px;position:sticky;top:0;z-index:5;background:rgba(0,0,0,.85);backdrop-filter:blur(10px)}.tabsb .btn{white-space:nowrap}.tabsb .on{background:rgba(124,92,255,.85);border-color:#7c5cff}
+@media(max-width:600px){body{padding:12px}.card{padding:16px}.two{grid-template-columns:1fr}#ovs .two{grid-template-columns:1fr 1fr!important}.item{flex-direction:column;align-items:stretch}.item .row{justify-content:flex-start}.row .btn{flex:1 1 auto}input,select,textarea{font-size:16px}.tabsb{margin:0 -12px;padding:4px 12px 12px}.top{flex-wrap:wrap;gap:8px}h1{font-size:18px}}
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Kufam:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -66,6 +68,8 @@ h1,h2,h3,.tabs button,.btn,.chip,.drawer a,.drawer button,.dc,.gbtn,.vis,.fwt,.b
 
 <div id="panel">
   <div class="top"><h1>إدارة المحتوى</h1><div class="row" style="margin:0"><button class="btn" onclick="openSite()">فتح الموقع</button><button class="btn" onclick="out()">خروج</button></div></div>
+  <div class="tabsb" id="tabsb"></div>
+  <div class="card"><h2>نظرة عامة</h2><div id="ovs"></div></div>
 
   <div class="card">
     <h2 id="ft">محتوى جديد</h2>
@@ -106,6 +110,8 @@ h1,h2,h3,.tabs button,.btn,.chip,.drawer a,.drawer button,.dc,.gbtn,.vis,.fwt,.b
       <button class="btn" onclick="addBox('warn')">إضافة تحذير</button>
       <button class="btn" onclick="addBox('must')">إضافة يجب</button>
       <button class="btn" onclick="document.getElementById('imgfile').click()">رفع صورة وإدراجها</button>
+      <button class="btn" onclick="document.getElementById('vfile').click()">رفع فيديو MP4 وإدراجه</button><input type="file" id="vfile" accept="video/mp4,.mp4" style="display:none" onchange="upVideo()">
+      <div style="width:100%"><label>أو رابط مباشر لفيديو (.mp4) أو ملف (.pdf)</label><input id="lnk" dir="ltr" placeholder="https://.../file.mp4"><div class="row"><button class="btn" onclick="addLink()">إدراج الرابط في المقال</button></div></div>
       <input type="file" id="imgfile" accept="image/*" style="display:none" onchange="upInline()">
     </div>
     <div class="row">
@@ -116,7 +122,26 @@ h1,h2,h3,.tabs button,.btn,.chip,.drawer a,.drawer button,.dc,.gbtn,.vis,.fwt,.b
   </div>
 
   <div class="card"><h2>عدد الزوار</h2><p class="m" id="vinfo"></p><label>العدد القديم (يُضاف عليه العدد الفعلي تلقائيًا)</label><input type="number" id="vbase" min="0"><div class="row"><button class="btn p" onclick="saveBase()">حفظ العدد القديم</button></div><label>إعلان يظهر لكل الزوار (اتركه فارغًا للإخفاء)</label><input id="vnotice"><div class="row"><button class="btn p" onclick="saveNotice()">نشر الإعلان</button></div><div class="msg" id="vm"></div></div>
-  <div class="card"><h2>الرسائل الواردة <span id="unread"></span></h2><div id="inbox">لا توجد رسائل.</div></div>
+  <div class="card"><h2>المكتبة</h2>
+<details><summary class="btn" style="display:inline-flex">إدارة الكتّاب</summary>
+<label>اسم الكاتب</label><input id="aun">
+<label>صورة الكاتب</label><input type="file" id="aufile" accept="image/*" onchange="upAuPhoto()"><input id="aup" dir="ltr" placeholder="رابط الصورة" style="margin-top:6px">
+<label>نبذة عن الكاتب</label><textarea id="aub" style="min-height:90px;direction:rtl;text-align:right;font-family:inherit"></textarea>
+<div class="row"><button class="btn p" onclick="saveAuthor()">حفظ الكاتب</button><button class="btn" onclick="clearAu()">إلغاء التعديل</button></div>
+<div id="aulist" style="margin-top:10px"></div></details>
+<details open style="margin-top:10px"><summary class="btn" style="display:inline-flex">إضافة أو تعديل كتاب</summary>
+<label>اسم الكتاب</label><input id="bkt">
+<label>الوصف</label><textarea id="bkd" style="min-height:90px;direction:rtl;text-align:right;font-family:inherit"></textarea>
+<div class="two"><div><label>الفئة</label><input id="bkc" list="bkcats"><datalist id="bkcats"></datalist></div><div><label>الكاتب</label><select id="bka"></select></div></div>
+<label>غلاف الكتاب</label><input type="file" id="bkcvf" accept="image/*" onchange="upBkCover()"><input id="bkcv" dir="ltr" placeholder="رابط الغلاف" style="margin-top:6px">
+<label>ملف الكتاب (ينتهي بـ .pdf وحتى 25 ميجابايت)</label><input type="file" id="bkpdf" accept="application/pdf,.pdf">
+<label>أو رابط مباشر لملف PDF (ينتهي بـ .pdf)</label><input id="bkurl" dir="ltr" placeholder="https://.../book.pdf">
+<p class="m" id="bkhint" style="margin-top:6px"></p>
+<div class="row"><button class="btn p" onclick="saveBook()">حفظ الكتاب</button><button class="btn" onclick="clearBook()">إلغاء التعديل</button></div>
+</details>
+<div class="msg" id="libm"></div>
+<div id="bklist" style="margin-top:10px"></div></div>
+<div class="card"><h2>الرسائل الواردة <span id="unread"></span></h2><div id="inbox">لا توجد رسائل.</div></div>
   <div class="card"><h2>المحتوى المنشور</h2><p class="m" id="cnts"></p><div id="list"></div></div>
 </div>
 </div>
@@ -160,7 +185,7 @@ window.out=function(){signOut(auth)};
 onAuthStateChanged(auth,function(u){
   var ok=u&&u.emailVerified&&u.email.toLowerCase()===ADMIN;
   $('login').style.display=ok?'none':'block';$('panel').style.display=ok?'block':'none';
-  if(ok){loadList();loadVis();watchInbox()}
+  if(ok){loadList();loadVis();watchInbox();loadLib();if(!window._it){window._it=1;initTabs()}}
 });
 
 async function upload(file){
@@ -219,7 +244,7 @@ function watchInbox(){
       var dl=document.createElement('button');dl.className='btn d';dl.textContent='حذف';dl.onclick=function(){if(confirm('حذف الرسالة؟'))deleteDoc(doc(db,'khmsgs',ds.id))};
       ac.appendChild(rp);if(!m.read)ac.appendChild(rd);ac.appendChild(dl);r.appendChild(l);r.appendChild(ac);L.appendChild(r);
     });
-    $('unread').textContent=un?'('+un+' جديدة)':'';document.title=un?'('+un+') Admin':'Admin';
+    $('unread').textContent=un?'('+un+' جديدة)':'';document.title=un?'('+un+') Admin':'Admin';UNR=un;renderOv();
   },function(e){$('inbox').textContent='تعذر قراءة الرسائل: '+(e.code||e.message)});
 }
 window.aiFill=async function(){
@@ -247,6 +272,123 @@ window.aiFill=async function(){
     msg('fm','تم اقتراح الملخص والوسوم. راجعهما قبل النشر.','ok');
   }catch(e){msg('fm','تعذر التوليد: '+e.message,'er')}
 };
+var AUTHS=[],BKS=[],editAu=null,editBk=null;
+function b64(u8){var s='',c=0x8000;for(var i=0;i<u8.length;i+=c)s+=String.fromCharCode.apply(null,u8.subarray(i,i+c));return btoa(s)}
+async function uploadFile(file,kind,onp){
+  var buf=new Uint8Array(await file.arrayBuffer()),CH=700000,n=Math.max(1,Math.ceil(buf.length/CH)),id=doc(collection(db,'khfiles')).id,done=0,i=0;
+  async function w(){while(i<n){var k=i++;await setDoc(doc(db,'khfiles',id,'p',String(k)),{d:b64(buf.subarray(k*CH,(k+1)*CH))});done++;if(onp)onp(done/n)}}
+  try{await Promise.all([w(),w(),w()]);await setDoc(doc(db,'khfiles',id),{kind:kind,name:file.name,size:buf.length,n:n,t:Date.now()})}
+  catch(e){await delFile(id,n);throw e}
+  return id;
+}
+async function delFile(id,n){try{if(n==null){var m=await getDoc(doc(db,'khfiles',id));n=m.exists()?m.data().n:0}for(var i=0;i<n;i++)await deleteDoc(doc(db,'khfiles',id,'p',String(i)));await deleteDoc(doc(db,'khfiles',id))}catch(e){console.error(e)}}
+window.upVideo=async function(){
+  var f=$('vfile').files[0];if(!f)return;
+  if(!/\.mp4$/i.test(f.name)){msg('fm','الملف يجب أن ينتهي بـ .mp4','er');$('vfile').value='';return}
+  if(f.size>40e6){msg('fm','حجم الفيديو يتجاوز 40 ميجابايت. اضغطه أولًا.','er');$('vfile').value='';return}
+  try{var id=await uploadFile(f,'mp4',function(p){msg('fm','جارِ رفع الفيديو '+Math.round(p*100)+'%','ok')});var a=getBlocks();a.push({video:id,title:f.name.replace(/\.mp4$/i,'')});setBlocks(a);msg('fm','تم رفع الفيديو وإدراجه في المحتوى.','ok')}
+  catch(e){msg('fm','فشل رفع الفيديو: '+(e.code||e.message),'er')}
+  $('vfile').value='';
+};
+window.upAuPhoto=async function(){var f=$('aufile').files[0];if(!f)return;msg('libm','جارِ رفع الصورة','ok');try{$('aup').value=await upload(f);msg('libm','تم رفع صورة الكاتب.','ok')}catch(e){msg('libm','فشل رفع الصورة.','er')}};
+window.upBkCover=async function(){var f=$('bkcvf').files[0];if(!f)return;msg('libm','جارِ رفع الغلاف','ok');try{$('bkcv').value=await upload(f);msg('libm','تم رفع الغلاف.','ok')}catch(e){msg('libm','فشل رفع الغلاف.','er')}};
+function lrow(t,s,btns){
+  var r=document.createElement('div');r.className='item';var l=document.createElement('div'),b=document.createElement('b');b.textContent=t;var sm=document.createElement('small');sm.textContent=s;l.appendChild(b);l.appendChild(sm);
+  var a=document.createElement('div');a.className='row';a.style.marginTop='0';
+  btns.forEach(function(x){var bt=document.createElement('button');bt.className='btn'+(x[2]?' d':'');bt.textContent=x[0];bt.onclick=x[1];a.appendChild(bt)});
+  r.appendChild(l);r.appendChild(a);return r;
+}
+async function loadLib(){
+  try{
+    var a=await getDocs(collection(db,'khauthors'));AUTHS=a.docs.map(function(d){var o=d.data();o.id=d.id;return o}).sort(function(x,y){return String(x.name).localeCompare(String(y.name),'ar')});
+    var b=await getDocs(query(collection(db,'khbooks'),orderBy('t','desc')));BKS=b.docs.map(function(d){var o=d.data();o.id=d.id;return o});
+    renderLib();renderOv();
+  }catch(e){msg('libm','تعذر قراءة المكتبة: '+(e.code||e.message),'er')}
+}
+function renderLib(){
+  var al=$('aulist');al.innerHTML='';if(!AUTHS.length)al.textContent='لا يوجد كتّاب بعد.';
+  AUTHS.forEach(function(x){al.appendChild(lrow(x.name,BKS.filter(function(b){return b.authorId===x.id}).length+' كتاب',[['تعديل',function(){editAuthor(x.id)}],['حذف',function(){delAuthor(x.id)},1]]))});
+  var sel=$('bka'),cur=sel.value;sel.innerHTML='';var o0=document.createElement('option');o0.value='';o0.textContent='اختر الكاتب';sel.appendChild(o0);
+  AUTHS.forEach(function(x){var o=document.createElement('option');o.value=x.id;o.textContent=x.name;sel.appendChild(o)});sel.value=cur;
+  var dl=$('bkcats');dl.innerHTML='';var cs={};BKS.forEach(function(b){if(b.cat)cs[b.cat]=1});Object.keys(cs).forEach(function(c){var o=document.createElement('option');o.value=c;dl.appendChild(o)});
+  var bl=$('bklist');bl.innerHTML='';if(!BKS.length)bl.textContent='لا توجد كتب بعد.';
+  BKS.forEach(function(b){bl.appendChild(lrow(b.title,(b.authorName||'')+' - '+(b.cat||''),[['فتح',function(){var u=siteUrl(true);if(u)window.open(u.replace(/#.*$/,'')+'#/book/'+b.id,'_blank')}],['تعديل',function(){editBook(b.id)}],['حذف',function(){delBook(b.id)},1]]))});
+}
+window.saveAuthor=async function(){
+  var n=$('aun').value.trim();if(!n){msg('libm','اسم الكاتب مطلوب.','er');return}
+  var d={name:n,photo:$('aup').value.trim(),bio:$('aub').value.trim()};
+  try{
+    if(editAu){await setDoc(doc(db,'khauthors',editAu),d,{merge:true});var bs=BKS.filter(function(b){return b.authorId===editAu});for(var i=0;i<bs.length;i++)await setDoc(doc(db,'khbooks',bs[i].id),{authorName:n},{merge:true})}
+    else{d.t=Date.now();await addDoc(collection(db,'khauthors'),d)}
+    msg('libm','تم حفظ الكاتب.','ok');clearAu();loadLib();
+  }catch(e){msg('libm','تعذر الحفظ: '+(e.code||e.message),'er')}
+};
+window.clearAu=function(){editAu=null;['aun','aup','aub'].forEach(function(i){$(i).value=''});$('aufile').value=''};
+function editAuthor(id){var x=AUTHS.filter(function(a){return a.id===id})[0];if(!x)return;editAu=id;$('aun').value=x.name||'';$('aup').value=x.photo||'';$('aub').value=x.bio||'';msg('libm','تعديل الكاتب: '+x.name,'ok');window.scrollTo({top:$('aun').getBoundingClientRect().top+scrollY-120,behavior:'smooth'})}
+async function delAuthor(id){
+  if(BKS.some(function(b){return b.authorId===id})){msg('libm','لا يمكن حذف كاتب له كتب. احذف كتبه أولًا.','er');return}
+  if(!confirm('حذف الكاتب نهائيًا؟'))return;
+  try{await deleteDoc(doc(db,'khauthors',id));loadLib()}catch(e){msg('libm','تعذر الحذف: '+(e.code||e.message),'er')}
+}
+window.saveBook=async function(){
+  var t=$('bkt').value.trim(),au=$('bka').value,cover=$('bkcv').value.trim();
+  if(!t||!au){msg('libm','اسم الكتاب والكاتب مطلوبان.','er');return}
+  if(!cover){msg('libm','ارفع غلاف الكتاب.','er');return}
+  var f=$('bkpdf').files[0],old=editBk?BKS.filter(function(x){return x.id===editBk})[0]:null,fid=old?old.fileId:'',oldFid=null;
+  var url=$('bkurl').value.trim(),pu=old&&old.pdfUrl?old.pdfUrl:'';
+  if(url){if(!/^https?:\/\/\S+\.pdf(\?\S*)?$/i.test(url)){msg('libm','الرابط يجب أن ينتهي بـ .pdf','er');return}pu=url}
+  if(!f&&!fid&&!pu){msg('libm','اختر ملف PDF أو الصق رابطًا ينتهي بـ .pdf','er');return}
+  if(f&&!/\.pdf$/i.test(f.name)){msg('libm','الملف يجب أن ينتهي بـ .pdf','er');return}
+  if(f&&f.size>25e6){msg('libm','حجم الكتاب يتجاوز 25 ميجابايت. اضغطه أولًا.','er');return}
+  try{
+    if(f){fid2=await uploadFile(f,'pdf',function(p){msg('libm','جارِ رفع الكتاب '+Math.round(p*100)+'%','ok')});oldFid=fid;fid=fid2;pu=''}
+    var a=AUTHS.filter(function(x){return x.id===au})[0];
+    if(!f&&url&&fid){oldFid=fid;fid=''}
+    var d={title:t,desc:$('bkd').value.trim(),cat:$('bkc').value.trim(),authorId:au,authorName:a?a.name:'',cover:cover,fileId:fid,pdfUrl:pu,t:old?old.t:Date.now()};
+    if(editBk)await setDoc(doc(db,'khbooks',editBk),d);else await addDoc(collection(db,'khbooks'),d);
+    if(oldFid)delFile(oldFid);
+    msg('libm','تم حفظ الكتاب.','ok');clearBook();loadLib();
+  }catch(e){msg('libm','تعذر الحفظ: '+(e.code||e.message),'er')}
+};
+var fid2='';
+window.clearBook=function(){editBk=null;['bkt','bkd','bkc','bkcv','bkurl'].forEach(function(i){$(i).value=''});$('bka').value='';$('bkpdf').value='';$('bkcvf').value='';$('bkhint').textContent=''};
+function editBook(id){var b=BKS.filter(function(x){return x.id===id})[0];if(!b)return;editBk=id;$('bkt').value=b.title||'';$('bkd').value=b.desc||'';$('bkc').value=b.cat||'';$('bka').value=b.authorId||'';$('bkcv').value=b.cover||'';$('bkurl').value=b.pdfUrl||'';$('bkhint').textContent='الملف الحالي محفوظ. اختر ملفًا جديدًا فقط لاستبداله.';msg('libm','تعديل الكتاب: '+b.title,'ok');window.scrollTo({top:$('bkt').getBoundingClientRect().top+scrollY-120,behavior:'smooth'})}
+async function delBook(id){
+  var b=BKS.filter(function(x){return x.id===id})[0];if(!b||!confirm('حذف الكتاب وملفه نهائيًا؟'))return;
+  try{if(b.fileId)await delFile(b.fileId);await deleteDoc(doc(db,'khbooks',id));loadLib()}catch(e){msg('libm','تعذر الحذف: '+(e.code||e.message),'er')}
+}
+var TAB='ov',UNR=0,TN={post:'مقال',project:'مشروع',news:'خبر'},TABS=[['ov','نظرة عامة'],['post','المقالات'],['project','المشاريع'],['news','الأخبار'],['lib','المكتبة'],['msg','الرسائل'],['set','الإعدادات']];
+function buildTabs(){var t=$('tabsb');t.innerHTML='';TABS.forEach(function(x){var b=document.createElement('button');b.className='btn'+(x[0]===TAB?' on':'');b.textContent=x[1];b.onclick=function(){showTab(x[0])};t.appendChild(b)})}
+window.showTab=function(t){
+  TAB=t;try{sessionStorage.setItem('atab',t)}catch(e){}
+  var map={ov:'ov',post:'edit',project:'edit',news:'edit',lib:'lib',msg:'msg',set:'set'};
+  document.querySelectorAll('[data-sec]').forEach(function(c){c.style.display=c.dataset.sec===map[t]?'':'none'});
+  if(map[t]==='edit'){$('type').value=t;$('type').parentElement.style.display='none';resetForm(true);$('ft').textContent=TN[t]+' جديد';loadList()}
+  buildTabs();window.scrollTo(0,0);if(t==='ov')renderOv();
+};
+function initTabs(){
+  [['ft','edit'],['list','edit'],['bklist','lib'],['inbox','msg'],['vbase','set'],['ovs','ov']].forEach(function(p){var c=$(p[0]).closest('.card');if(c)c.dataset.sec=p[1]});
+  var s='ov';try{s=sessionStorage.getItem('atab')||'ov'}catch(e){}showTab(s);
+}
+function renderOv(){
+  var o=$('ovs');if(!o)return;o.innerHTML='';
+  var c=function(t){return CACHE.filter(function(x){return x.type===t}).length};
+  var g=document.createElement('div');g.className='two';g.style.gridTemplateColumns='1fr 1fr 1fr';
+  [['المقالات',c('post'),'post'],['المشاريع',c('project'),'project'],['الأخبار',c('news'),'news'],['الكتب',BKS.length,'lib'],['الكتّاب',AUTHS.length,'lib'],['رسائل جديدة',UNR,'msg']].forEach(function(x){
+    var d=document.createElement('div');d.className='card';d.style.cssText='padding:14px;text-align:center;cursor:pointer;margin:0';
+    var n=document.createElement('div');n.style.cssText='font-size:26px;font-weight:700';n.textContent=x[1];
+    var l=document.createElement('div');l.className='m';l.style.margin='4px 0 0';l.textContent=x[0];d.appendChild(n);d.appendChild(l);d.onclick=function(){showTab(x[2])};g.appendChild(d);
+  });
+  o.appendChild(g);var v=document.createElement('p');v.className='m';v.style.marginTop='12px';v.textContent=($('vinfo')&&$('vinfo').textContent)||'';o.appendChild(v);
+}
+window.addLink=function(){
+  var u=$('lnk').value.trim();if(!/^https?:\/\/\S+$/i.test(u)){msg('fm','الصق رابطًا صحيحًا يبدأ بـ http.','er');return}
+  var a=getBlocks(),t=$('bt').value.trim();
+  if(/\.mp4(\?\S*)?$/i.test(u))a.push({video:'link',src:u,title:t||'فيديو'});
+  else if(/\.pdf(\?\S*)?$/i.test(u))a.push({pdf:u,title:t||'ملف PDF'});
+  else{msg('fm','الرابط يجب أن ينتهي بـ .mp4 أو .pdf','er');return}
+  setBlocks(a);$('lnk').value='';msg('fm','تم إدراج الرابط في المحتوى.','ok');
+};
 window.addBox=function(k){
   var t=$('bt').value.trim();if(!t){msg('fm','اكتب النص أولًا.','er');return}
   var T={note:'التنبيه',warn:'التحذير',must:'يجب'};
@@ -271,14 +413,14 @@ window.save=async function(){
 };
 window.resetForm=function(keep){
   editing=null;['title','summary','link','cover','body','tags'].forEach(function(i){$(i).value=''});$('pinned').checked=false;$('draft').checked=false;
-  $('cpv').style.display='none';$('ft').textContent='محتوى جديد';$('savebtn').textContent='نشر';
+  $('cpv').style.display='none';$('ft').textContent=(TN[TAB]||'محتوى')+' جديد';$('savebtn').textContent='نشر';
   if(keep!==true)msg('fm','','ok'),$('fm').className='msg';
 };
 async function loadVis(){
   try{var r=doc(db,'khmeta','stats'),s=await getDoc(r);
     if(!s.exists()){await setDoc(r,{base:0,real:0});s=await getDoc(r)}
     var d=s.data(),b=Number(d.base)||0,x=Number(d.real)||0;
-    $('vbase').value=b;$('vnotice').value=d.notice||'';$('vinfo').textContent='الفعلي المسجل: '+x+' | الإجمالي المعروض للزوار: '+(b+x);
+    $('vbase').value=b;$('vnotice').value=d.notice||'';$('vinfo').textContent='الفعلي المسجل: '+x+' | الإجمالي المعروض للزوار: '+(b+x);renderOv();
   }catch(e){msg('vm','تعذر قراءة العداد: '+(e.code||e.message),'er')}
 }
 window.saveNotice=async function(){try{await setDoc(doc(db,'khmeta','stats'),{notice:$('vnotice').value.trim()},{merge:true});msg('vm','تم تحديث الإعلان.','ok')}catch(e){msg('vm','تعذر الحفظ: '+(e.code||e.message),'er')}};
@@ -291,11 +433,11 @@ async function loadList(){
   var ST={};try{(await getDocs(collection(db,'khstats'))).forEach(function(d){ST[d.id]=d.data()})}catch(e){}
   var s=await getDocs(query(collection(db,'khcontent'),orderBy('createdAt','desc')));
   CACHE=s.docs.map(function(d){var o=d.data();o.id=d.id;return o});
-  var cn=function(t){return CACHE.filter(function(x){return x.type===t}).length};$('cnts').textContent='مقالات: '+cn('post')+' | مشاريع: '+cn('project')+' | أخبار: '+cn('news')+' | مسودات: '+CACHE.filter(function(x){return x.draft}).length;
+  var cn=function(t){return CACHE.filter(function(x){return x.type===t}).length};$('cnts').textContent='مقالات: '+cn('post')+' | مشاريع: '+cn('project')+' | أخبار: '+cn('news')+' | مسودات: '+CACHE.filter(function(x){return x.draft}).length;renderOv();
   var L=$('list');L.innerHTML='';
   var N={post:'مقال',news:'خبر',project:'مشروع'};
-  if(!CACHE.length){L.textContent='لا يوجد محتوى بعد.';return}
-  CACHE.forEach(function(it){
+  if(!CACHE.filter(function(x){return x.type===TAB}).length){L.textContent='لا يوجد محتوى في هذا القسم بعد.';return}
+  CACHE.filter(function(it){return it.type===TAB}).forEach(function(it){
     var r=document.createElement('div');r.className='item';
     var l=document.createElement('div');var b=document.createElement('b');b.textContent=it.title;
     var sm=document.createElement('small');sm.textContent=(N[it.type]||'')+' - '+new Date(it.createdAt).toLocaleDateString('ar-EG')+(it.pinned?' - مثبت':'')+(it.draft?' - مسودة':'')+(ST[it.id]?' - '+(ST[it.id].views||0)+' مشاهدة - '+(ST[it.id].likes||0)+' إعجاب':'');
